@@ -8,17 +8,19 @@
 int main(int argc, char *argv[])
 {
     // ensure proper usage
-    if (argc != 3)
+    if (argc != 4 || (atoi(argv[1]) > 100 || atoi(argv[1]) < 1))
     {
-        fprintf(stderr, "Usage: copy infile outfile\n");
+        fprintf(stderr, "Usage: resize newSize infile outfile\n");
         return 1;
     }
 
     // remember filenames
     char *infile = argv[1];
     char *outfile = argv[2];
+    int new_size = atoi(argv[1]);
 
-    // open input file
+
+    // open input file and if it couldn't open throw an error.
     FILE *inptr = fopen(infile, "r");
     if (inptr == NULL)
     {
@@ -26,7 +28,7 @@ int main(int argc, char *argv[])
         return 2;
     }
 
-    // open output file
+    // open output file and if it couldn't open throw an error.
     FILE *outptr = fopen(outfile, "w");
     if (outptr == NULL)
     {

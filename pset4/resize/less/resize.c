@@ -14,11 +14,10 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // remember filenames
-    char *infile = argv[1];
-    char *outfile = argv[2];
+    // remember filenames and the size to resize by.
+    char *infile = argv[2];
+    char *outfile = argv[3];
     int new_size = atoi(argv[1]);
-
 
     // open input file and if it couldn't open throw an error.
     FILE *inptr = fopen(infile, "r");
@@ -54,7 +53,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Unsupported file format.\n");
         return 4;
     }
-
     // update width and height
     bi.biWidth *= new_size;
     bi.biHeight *= new_size;
@@ -72,9 +70,6 @@ int main(int argc, char *argv[])
 
     // write outfile's BITMAPINFOHEADER
     fwrite(&bi, sizeof(BITMAPINFOHEADER), 1, outptr);
-
-    // determine padding for scanlines
-    int padding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
 
     // iterate over infile's scanlines
     for (int i = 0, biHeight = abs(bi.biHeight) / new_size; i < biHeight; i++)
@@ -101,11 +96,12 @@ int main(int argc, char *argv[])
             }
         }
 
-        // then add it back (to demonstrate how)
-        for (int k = 0; k < padding; k++)
+        // Add padding for the original scanlines.
+        for (int k = 0; k < output_padding; k++)
         {
             fputc(0x00, outptr);
         }
+
         if (new_size != 1)
         {
             // add extra scanlines times new_size - 1.

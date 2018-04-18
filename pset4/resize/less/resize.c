@@ -77,10 +77,14 @@ int main(int argc, char *argv[])
     int padding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
 
     // iterate over infile's scanlines
-    for (int i = 0, biHeight = abs(bi.biHeight); i < biHeight; i++)
+    for (int i = 0, biHeight = abs(bi.biHeight) / new_size; i < biHeight; i++)
     {
+        // creating an array of struct RGBTRIPLE that will hold the current scanline in it.
+        RGBTRIPLE current_scanline[bi.biWidth];
+        int position = 0;
+
         // iterate over pixels in scanline
-        for (int j = 0; j < bi.biWidth; j++)
+        for (int j = 0; j < bi.biWidth / new_size; j++)
         {
             // temporary storage
             RGBTRIPLE triple;
@@ -88,18 +92,40 @@ int main(int argc, char *argv[])
             // read RGB triple from infile
             fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
 
-            // write RGB triple to outfile
-            fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
+            // iterate as many times as new_size, draw the pixle and add it to the current_scanline array.
+            for (size_t k = 0; k < new_size; k++)
+            {
+                fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
+                current_scanline[position] = triple;
+                position++;
+            }
         }
-
-        // skip over padding, if any
-        fseek(inptr, padding, SEEK_CUR);
 
         // then add it back (to demonstrate how)
         for (int k = 0; k < padding; k++)
         {
             fputc(0x00, outptr);
         }
+        if (new_size != 1)
+        {
+            // add extra scanlines times new_size - 1.
+            for (int a = 0; a < new_size - 1; a++)
+            {
+                // iterate over pixels in scanline
+                for (int b = 0; b <  bi.biWidth; b++)
+                {
+                    fwrite(&current_scanline[b], sizeof(RGBTRIPLE), 1, outptr);
+                }
+                // Add padding for the new scanlines.
+                for (int k = 0; k < output_padding; k++)
+                {
+                    fputc(0x00, outptr);
+                }
+            }
+        }
+
+        // skip over padding, if any
+        fseek(inptr, input_padding, SEEK_CUR);
     }
 
     // close infile

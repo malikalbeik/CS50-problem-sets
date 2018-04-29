@@ -4,6 +4,29 @@
 
 #include "dictionary.h"
 
+#define SIZE 20
+
+
+// defining the linked list's node.
+typedef struct node {
+    int val;
+    struct node * next;
+} node_t;
+
+// defining the hash function.
+// this hash function's name is djb2 and it's done by Dan Bernstein.
+// you can find the algrothim at http://www.cse.yorku.ca/~oz/hash.html
+unsigned long hash(unsigned char *str)
+{
+    unsigned long hash = 5381;
+    int c;
+    while (c = *str++)
+    {
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+    }
+    return hash;
+}
+
 // Returns true if word is in dictionary else false
 bool check(const char *word)
 {

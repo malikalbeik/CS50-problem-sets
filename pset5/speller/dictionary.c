@@ -44,7 +44,34 @@ unsigned long hash(const char *str)
 // Returns true if word is in dictionary else false
 bool check(const char *word)
 {
-    // TODO
+    char temp[strlen(word) + 1];
+    int length = strlen(word);
+    for(int i = 0; i < length; i++)
+        temp[i] = tolower(word[i]);
+    temp[length] = '\0';
+
+    int index = hash(temp);
+
+    // if hashtable is empty at index, return false
+    if (hash_table[index] == NULL)
+    {
+        return false;
+    }
+    // create cursor to compare to word
+    linked_list *cursor = hash_table[index];
+    
+    // if empty at index iterate till cursor is NULL
+    while (cursor != NULL)
+    {
+        if (strcmp(temp, cursor->val) == 0)
+        {
+            return true;
+        }
+        else {
+            cursor = cursor->next;
+        }
+    }
+    
     return false;
 }
 
@@ -107,6 +134,5 @@ unsigned int size(void)
 // Unloads dictionary from memory, returning true if successful else false
 bool unload(void)
 {
-    // TODO
     return false;
 }

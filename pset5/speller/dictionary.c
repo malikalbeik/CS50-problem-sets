@@ -134,5 +134,25 @@ unsigned int size(void)
 // Unloads dictionary from memory, returning true if successful else false
 bool unload(void)
 {
-    return false;
+    for(int i = 0; i < HASH_SIZE;)
+    {
+        // if empty go to the next index.
+        if (hash_table[i] == NULL)
+            i++;
+
+        else
+        {
+            // iterate untill every node in the linked list is empty
+            while(hash_table[i] != NULL)
+            {
+                linked_list* cursor = hash_table[i];
+                hash_table[i] = cursor->next;
+                free(cursor);
+            }
+            i++;
+        }
+    }
+    
+    // return true if successful
+    return true;
 }

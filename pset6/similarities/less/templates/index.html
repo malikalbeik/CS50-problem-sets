@@ -5,9 +5,50 @@
     <div class="col">
         <form action="/compare" enctype="multipart/form-data" method="post">
 
-            <!-- TODO -->
+            <div class="custom-file">
+                <label class="custom-file-label" for="file1">Choose file...</label>
+                <input type="file" class="custom-file-input" id="file1" name="file1">
+                <span class="custom-file-control"></span>
+            </div>
 
+            <div class="custom-file">
+                <label class="custom-file-label" for="file2">Choose file...</label>
+                <input type="file" class="custom-file-input" id="file2" name="file2">
+                <span class="custom-file-control"></span>
+            </div>
+            
+            
+            <div class="form-group">
+                <select class="custom-select" name="algorithm" onchange="showHide(this)">
+                    <option valeu="" selected>Choose algorithm</option>
+                    <option value="lines">lines</option>
+                    <option value="sentences">sentences</option>
+                    <option value="substrings">substrings</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="length-container">
+                <label for="lenght">type the length of the substring</label>
+                <input type="number" name="lenght" id="length" class="form-control">
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" class="btn">Compare</button>
+            </div>
         </form>
+              
     </div>
+
+    <script>
+            function showHide(elem) {
+                var lengthInput = document.getElementById("length-container");
+                if (elem.value == "substrings"){
+                    lengthInput.style.display = 'block';
+                }
+                else {
+                    lengthInput.style.display = 'none';
+                }
+            }
+    </script>
 
 {% endblock %}

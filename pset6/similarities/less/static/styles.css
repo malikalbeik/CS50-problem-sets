@@ -27,7 +27,7 @@ div.col
 /* add padding around form */
 form
 {
-    padding: 15px;
+    /* padding: 15px; */
 }
 
 /* wrap and scroll preformatted text */
@@ -43,4 +43,16 @@ pre
 span
 {
     background-color: #ff0;
+}
+
+#length-container {
+    display: none;
+}
+
+form > * {
+    margin:10px;
+}
+
+.btn {
+    border: solid 1px gray;
 }

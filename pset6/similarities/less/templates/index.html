@@ -5,18 +5,9 @@
     <div class="col">
         <form action="/compare" enctype="multipart/form-data" method="post">
 
-            <div class="custom-file">
-                <label class="custom-file-label" for="file1">Choose file...</label>
-                <input type="file" class="custom-file-input" id="file1" name="file1">
-                <span class="custom-file-control"></span>
-            </div>
+            <input type="file" name="file1">
 
-            <div class="custom-file">
-                <label class="custom-file-label" for="file2">Choose file...</label>
-                <input type="file" class="custom-file-input" id="file2" name="file2">
-                <span class="custom-file-control"></span>
-            </div>
-            
+            <input type="file" name="file2">
             
             <div class="form-group">
                 <select class="custom-select" name="algorithm" onchange="showHide(this)">
@@ -29,7 +20,7 @@
 
             <div class="form-group" id="length-container">
                 <label for="lenght">type the length of the substring</label>
-                <input type="number" name="lenght" id="length" class="form-control">
+                <input type="number" name="length" id="length" class="form-control">
             </div>
             
             <div class="form-group">

@@ -39,8 +39,14 @@ main img
     max-width: 100%;
 }
 
-main td
-{
-    /* left-align tables' cells */
-    text-align: left;
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 5px;
+    text-align: left;    
+}
+table {
+    width: 100%;
 }

@@ -33,7 +33,17 @@ db = SQL("sqlite:///finance.db")
 @app.route("/")
 @login_required
 def index():
-    return apology("TODO")
+    history = db.execute("SELECT * FROM purchases WHERE :id", id=session["user_id"])
+    if not history:
+        return apology("you don't have any history to display")
+
+    else:
+        total = 0
+        for item in history:
+            item["current_price"] = lookup(item["stock_symbol"])['price']
+            total += item["current_price"]*item["shares"]
+        cash = round(db.execute("SELECT cash FROM users WHERE id = :id", id=session["user_id"])[0]["cash"], 2)
+        return render_template("index.html", history=history, total=total, cash=cash)
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -66,12 +76,13 @@ def buy():
         else:
             remainingCash = float(cash) - float(shares) * float(stock['price'])
             db.execute("UPDATE users SET cash = :remainingCash WHERE id = :id", id=session["user_id"], remainingCash=remainingCash)
-            db.execute("INSERT INTO purchases (user_id, price_bought, stock_symbol, shares) \
-                             VALUES(:user_id, :price_bought, :stock_symbol, :shares)", \
+            db.execute("INSERT INTO purchases (user_id, price_bought, stock_symbol, shares, sold) \
+                             VALUES(:user_id, :price_bought, :stock_symbol, :shares, :sold)", \
                              user_id = session["user_id"], \
                              price_bought = stock['price'], \
                              stock_symbol = stock['symbol'], \
-                             shares = shares)
+                             shares = shares, \
+                             sold = False)
                              
 
             return render_template("bought.html", shares=shares, price=stock['price'], symbol=stock['symbol'], remainingCash= round(db.execute("SELECT cash FROM users WHERE id = :id", id=session["user_id"])[0]["cash"], 2))

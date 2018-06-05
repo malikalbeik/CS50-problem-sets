@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Buy
+{% endblock %}
+
+{% block main %}
+    <form action="/buy" method="post">
+        <fieldset>
+
+            <div class="form-group">
+                <input autocomplete="off" autofocus class="form-control" name="share" placeholder="share symbol" type="text"/>
+            </div>
+
+            <div class="form-group">
+                <input autocomplete="off" autofocus class="form-control" name="number" placeholder="number of shares" type="number"/>
+            </div>
+
+            <div class="form-group">
+                <button class="btn btn-default" type="submit">Buy</button>
+            </div>
+        </fieldset>
+    </form>
+{% endblock %}

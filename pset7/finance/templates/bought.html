@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Bought
+{% endblock %}
+
+{% block main %}
+    <h1>Congratulations</h1>
+    <p>you have successfully bought {{ shares }} shares of {{ symbol }} at a price of {{ price }}</p>
+    <p>you remaining cash is {{ remainingCash }}</p>
+{% endblock %}

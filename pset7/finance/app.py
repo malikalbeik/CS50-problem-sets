@@ -35,11 +35,49 @@ db = SQL("sqlite:///finance.db")
 def index():
     return apology("TODO")
 
+
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
     """Buy shares of stock."""
-    return apology("TODO")
+    if request.method == "POST":
+        # ensure shares symbol was submitted
+        if not request.form.get("share"):
+            return apology("must provide share symbol")
+
+        # ensure the share's symbol is valid was submitted
+        elif not lookup(request.form.get("share")):
+            return apology("must provide a valid share symbol")
+
+        # ensure the number of shares to be bought was submitted
+        elif not request.form.get("number"):
+            return apology("must provide a number of shares to be bought symbol")
+
+        # ensure the number of shares to be bought is positive submitted 
+        elif int(request.form.get("number")) < 0:
+            return apology("must provide a positive number of shares to be bought symbol")
+
+        shares = request.form.get("number")
+        stock = lookup(request.form.get("share"))
+        cash = db.execute("SELECT cash FROM users WHERE id = :id", id=session["user_id"])[0]["cash"]
+
+        if cash < int(request.form.get("number")) * stock['price']:
+            return apology("You don't have enough money to buy this stock")
+        else:
+            remainingCash = float(cash) - float(shares) * float(stock['price'])
+            db.execute("UPDATE users SET cash = :remainingCash WHERE id = :id", id=session["user_id"], remainingCash=remainingCash)
+            db.execute("INSERT INTO purchases (user_id, price_bought, stock_symbol, shares) \
+                             VALUES(:user_id, :price_bought, :stock_symbol, :shares)", \
+                             user_id = session["user_id"], \
+                             price_bought = stock['price'], \
+                             stock_symbol = stock['symbol'], \
+                             shares = shares)
+                             
+
+            return render_template("bought.html", shares=shares, price=stock['price'], symbol=stock['symbol'], remainingCash= round(db.execute("SELECT cash FROM users WHERE id = :id", id=session["user_id"])[0]["cash"], 2))
+    else:
+        return render_template("buy.html")
+
 
 @app.route("/history")
 @login_required

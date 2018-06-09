@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    sell
+{% endblock %}
+
+{% block main %}
+    <h1>History</h1>
+    <table>
+        <tr>
+            <th>Stock</th>
+            <th>Shares</th>
+            <th>Price Bought</th>
+            <th>Price Sold</th>
+            <th>Total Value</th>
+            <th>Action</th>
+            <th>Time</th>
+        </tr>
+        {% for item in history %}
+            <tr>
+                <th>{{ item['stock_symbol'] }}</th> 
+                <th>{{ item['shares'] }}</th>
+                <th>{{ item['price'] }}</th>
+                {% if item['price_sold'] %}
+                    <th>{{ item['price_sold'] }}</th>
+                    <th>{{ item['price_sold']*item['shares'] }}</th>
+                {% else %}
+                    <th></th>
+                    <th>{{ item['price']*item['shares'] }}</th>
+                {% endif %}
+                <th>
+                    {% if item['price_sold'] %}
+                        Sold
+                    {% else %}
+                        Bought
+                    {% endif %}
+                </th>
+                <th>{{item['time']}}</th>
+                
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

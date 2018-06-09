@@ -3,6 +3,7 @@ from flask import Flask, flash, redirect, render_template, request, session, url
 from flask_session import Session
 from passlib.apps import custom_app_context as pwd_context
 from tempfile import mkdtemp
+import time
 
 from helpers import *
 
@@ -83,13 +84,14 @@ def buy():
                              stock_symbol = stock['symbol'], \
                              shares = shares, \
                              sold = 0)
-            db.execute("INSERT INTO history (user_id, price, stock_symbol, shares, sold) \
-                             VALUES(:user_id, :price, :stock_symbol, :shares, :sold)", \
-                             user_id = session["user_id"], \
-                             price = stock['price'], \
-                             stock_symbol = stock['symbol'], \
-                             shares = shares, \
-                             sold = 0)
+            db.execute("INSERT INTO history (user_id, price, stock_symbol, shares, sold, time) \
+                        VALUES(:user_id, :price, :stock_symbol, :shares, :sold, :time)", \
+                        user_id = session["user_id"], \
+                        price = stock['price'], \
+                        stock_symbol = stock['symbol'], \
+                        shares = shares, \
+                        sold = 0, \
+                        time = str(time.strftime("%d/%m/%Y-%H:%M:%S")))
                              
 
             return render_template("bought.html", shares=shares, price=stock['price'], symbol=stock['symbol'], remainingCash= round(db.execute("SELECT cash FROM users WHERE id = :id", id=session["user_id"])[0]["cash"], 2))
@@ -101,7 +103,10 @@ def buy():
 @login_required
 def history():
     """Show history of transactions."""
-    return apology("TODO")
+    history = db.execute("SELECT * FROM history WHERE user_id=:id", id=session["user_id"])
+    return render_template("history.html", history=history)
+
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -218,13 +223,16 @@ def sell():
         stock = db.execute("SELECT * FROM purchases  WHERE id=:id", id=request.form.get("stock"))[0]
         usersCash = db.execute("SELECT cash FROM users WHERE id = :id", id=session["user_id"])[0]["cash"]
         priceSold = lookup(stock['stock_symbol'])['price']
-        db.execute("INSERT INTO history (user_id, price, stock_symbol, shares, sold, price_sold) VALUES(:user_id, :price, :stock_symbol, :shares, :sold, :price_sold)", \
-                             user_id = session["user_id"], \
-                             price = stock['price_bought'], \
-                             stock_symbol = stock['stock_symbol'], \
-                             shares = stock['shares'], \
-                             sold = 1, \
-                             price_sold = priceSold)
+        db.execute("INSERT INTO history (user_id, price, stock_symbol, shares, sold, price_sold, time) \
+                    VALUES(:user_id, :price, :stock_symbol, :shares, :sold, :price_sold, :time)", \
+                    user_id = session["user_id"], \
+                    price = stock['price_bought'], \
+                    stock_symbol = stock['stock_symbol'], \
+                    shares = stock['shares'], \
+                    sold = 1, \
+                    price_sold = priceSold, \
+                    time = str(time.strftime("%d/%m/%Y-%H:%M:%S")))
+                             
         db.execute("UPDATE users SET cash=:cash WHERE id=:id", cash=usersCash+priceSold*stock['shares'], id=session["user_id"])
 
         return render_template("sold.html", item=stock, priceSold=priceSold, cash= db.execute("SELECT cash FROM users WHERE id = :id", id=session["user_id"])[0]["cash"])

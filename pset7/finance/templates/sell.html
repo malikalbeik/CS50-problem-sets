@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    sell
+{% endblock %}
+
+{% block main %}
+<h1>Sell stocks</h1>
+    <p>Choose which stock to sell</p>
+    <form action="{{ url_for('sell') }}" method="POST">
+        <select name="stock">
+            {% for item in items %}
+                {% if item['sold'] == 0 %}
+                <option value="{{ item['id'] }}">{{ item['shares'] }} stocks of {{ item['stock_symbol'] }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <div class="form-group">
+            <button class="btn btn-default" type="submit">Sell</button>
+        </div>
+    </form>
+    
+{% endblock %}

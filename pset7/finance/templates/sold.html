@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    sell
+{% endblock %}
+
+{% block main %}
+    <h1>Congratulations</h1>
+    <p>You have successfully sold {{ item['shares'] }} stocks of {{ item['stock_symbol'] }} at a price of {{ priceSold|round(2, 'common') }}</p>
+    <p>You now have {{ cash|round(2, 'common') }} in your wallet</p>
+{% endblock %}

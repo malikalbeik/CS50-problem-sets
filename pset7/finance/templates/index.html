@@ -15,15 +15,17 @@
             <th>Total Value</th>
         </tr>
         {% for item in history %}
-            <tr>
-                <th>{{ item['stock_symbol'] }}</th> 
-                <th>{{ item['shares'] }}</th>
-                <th>{{ item['price_bought'] }}</th>
-                <th>{{ item['current_price'] }}</th>
-                <th>{{ item['current_price']*item['shares']}}</th>
-            </tr>
+            {% if item['sold'] == 0 %}
+                <tr>
+                    <th>{{ item['stock_symbol'] }}</th> 
+                    <th>{{ item['shares'] }}</th>
+                    <th>{{ item['price_bought']|round(2, 'common') }}</th>
+                    <th>{{ item['current_price']|round(2, 'common') }}</th>
+                    <th>{{ (item['current_price']*item['shares'])|round(2, 'common') }}</th>
+                </tr>
+            {% endif %}
         {% endfor %}
     </table>
-    <p>the current total value of your stock is {{ total }} and you have {{ cash }} remaining in your account </p>
-    <p>Your total assets is {{ total + cash }}</p>
+    <p>the current total value of your stock is {{ total|round(2, 'common') }} and you have {{ cash|round(2, 'common') }} remaining in your account </p>
+    <p>Your total assets is {{ (total + cash)|round(2, 'common') }}</p>
 {% endblock %}

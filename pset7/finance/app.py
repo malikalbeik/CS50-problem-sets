@@ -33,17 +33,17 @@ db = SQL("sqlite:///finance.db")
 @app.route("/")
 @login_required
 def index():
-    history = db.execute("SELECT * FROM purchases WHERE :id", id=session["user_id"])
-    if not history:
-        return apology("you don't have any history to display")
+    purchases = db.execute("SELECT * FROM purchases WHERE user_id=:id AND sold=0", id=session["user_id"])
+    if not purchases:
+        return apology("you don't have any purchases to display")
 
     else:
         total = 0
-        for item in history:
+        for item in purchases:
             item["current_price"] = lookup(item["stock_symbol"])['price']
             total += item["current_price"]*item["shares"]
-        cash = round(db.execute("SELECT cash FROM users WHERE id = :id", id=session["user_id"])[0]["cash"], 2)
-        return render_template("index.html", history=history, total=total, cash=cash)
+        cash = db.execute("SELECT cash FROM users WHERE id = :id", id=session["user_id"])[0]["cash"]
+        return render_template("index.html", history=purchases, total=total, cash=cash)
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -61,7 +61,7 @@ def buy():
 
         # ensure the number of shares to be bought was submitted
         elif not request.form.get("number"):
-            return apology("must provide a number of shares to be bought symbol")
+            return apology("must provide a number of shares to be bought")
 
         # ensure the number of shares to be bought is positive submitted 
         elif int(request.form.get("number")) < 0:
@@ -82,7 +82,14 @@ def buy():
                              price_bought = stock['price'], \
                              stock_symbol = stock['symbol'], \
                              shares = shares, \
-                             sold = False)
+                             sold = 0)
+            db.execute("INSERT INTO history (user_id, price, stock_symbol, shares, sold) \
+                             VALUES(:user_id, :price, :stock_symbol, :shares, :sold)", \
+                             user_id = session["user_id"], \
+                             price = stock['price'], \
+                             stock_symbol = stock['symbol'], \
+                             shares = shares, \
+                             sold = 0)
                              
 
             return render_template("bought.html", shares=shares, price=stock['price'], symbol=stock['symbol'], remainingCash= round(db.execute("SELECT cash FROM users WHERE id = :id", id=session["user_id"])[0]["cash"], 2))
@@ -202,5 +209,32 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock."""
-    return apology("TODO")
+    if request.method == "POST":
 
+        if not request.form.get("stock"):
+            return apology("please provide a stock to sell")
+
+        db.execute("UPDATE purchases SET sold=1 WHERE id=:id", id=request.form.get("stock"))
+        stock = db.execute("SELECT * FROM purchases  WHERE id=:id", id=request.form.get("stock"))[0]
+        usersCash = db.execute("SELECT cash FROM users WHERE id = :id", id=session["user_id"])[0]["cash"]
+        priceSold = lookup(stock['stock_symbol'])['price']
+        db.execute("INSERT INTO history (user_id, price, stock_symbol, shares, sold, price_sold) VALUES(:user_id, :price, :stock_symbol, :shares, :sold, :price_sold)", \
+                             user_id = session["user_id"], \
+                             price = stock['price_bought'], \
+                             stock_symbol = stock['stock_symbol'], \
+                             shares = stock['shares'], \
+                             sold = 1, \
+                             price_sold = priceSold)
+        db.execute("UPDATE users SET cash=:cash WHERE id=:id", cash=usersCash+priceSold*stock['shares'], id=session["user_id"])
+
+        return render_template("sold.html", item=stock, priceSold=priceSold, cash= db.execute("SELECT cash FROM users WHERE id = :id", id=session["user_id"])[0]["cash"])
+
+    else:
+        items = db.execute("SELECT * FROM purchases WHERE sold=0")
+        if not items:
+            return apology("you don't a stock to sell")
+        total = 0
+        for item in items:
+            item["current_price"] = lookup(item["stock_symbol"])['price']
+            total += item["current_price"]*item["shares"]
+        return render_template("sell.html", items=items)

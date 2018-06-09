@@ -246,3 +246,39 @@ def sell():
             item["current_price"] = lookup(item["stock_symbol"])['price']
             total += item["current_price"]*item["shares"]
         return render_template("sell.html", items=items)
+
+
+@app.route("/profile", methods=["GET", "POST"])
+@login_required
+def profile():
+    """Show the users profile and change name or password."""
+    if request.method == "GET":
+        userName = db.execute("SELECT username FROM users WHERE id=:id", id=session["user_id"])[0]['username']
+        return render_template("profile.html", username=userName)
+    
+    else:
+        # ensure password was submitted
+        if not request.form.get("newpassword"):
+            return apology("must provide a new password")
+
+        # ensure retyped password was submitted
+        elif not request.form.get("newpassword2"):
+            return apology("must retype your old password")
+
+        # ensure retyped password was submitted
+        elif not request.form.get("oldpassword"):
+            return apology("must provide your old password")
+
+        # ensure new passwords match
+        elif request.form.get("newpassword") != request.form.get("newpassword2"):
+            return apology("the passwords that you provided must be the same")
+
+        row = db.execute("SELECT * FROM users WHERE id=:id", id=session["user_id"])
+        # ensure username exists and password is correct
+        if not row or not pwd_context.verify(str(request.form.get("oldpassword")), row[0]['hash']):
+            return apology("invalid password")
+
+        db.execute("UPDATE users SET hash=:hash WHERE id=:id", id=session["user_id"], hash=pwd_context.hash(request.form.get("newpassword", str))) 
+
+        # redirect user to home page
+        return redirect(url_for("index"))

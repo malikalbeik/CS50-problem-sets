@@ -20,13 +20,13 @@
             <tr>
                 <th>{{ item['stock_symbol'] }}</th> 
                 <th>{{ item['shares'] }}</th>
-                <th>{{ item['price'] }}</th>
+                <th>{{ item['price'] | usd }}</th>
                 {% if item['price_sold'] %}
-                    <th>{{ item['price_sold'] }}</th>
-                    <th>{{ item['price_sold']*item['shares'] }}</th>
+                    <th>{{ item['price_sold'] | usd }}</th>
+                    <th>{{ item['price_sold']*item['shares'] | usd }}</th>
                 {% else %}
                     <th></th>
-                    <th>{{ item['price']*item['shares'] }}</th>
+                    <th>{{ item['price']*item['shares'] | usd }}</th>
                 {% endif %}
                 <th>
                     {% if item['price_sold'] %}

@@ -6,6 +6,6 @@
 
 {% block main %}
     <h1>Congratulations</h1>
-    <p>you have successfully bought {{ shares }} shares of {{ symbol }} at a price of {{ price }}</p>
-    <p>you remaining cash is {{ remainingCash }}</p>
+    <p>you have successfully bought {{ shares }} shares of {{ symbol }} at a price of {{ price | usd }} the total value is {{ total | usd }}</p>
+    <p>you remaining cash is {{ remainingCash | usd }}</p>
 {% endblock %}

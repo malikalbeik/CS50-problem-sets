@@ -6,26 +6,30 @@
 
 {% block main %}
     <h1>Current stock</h1>
-    <table>
-        <tr>
-            <th>Stock</th>
-            <th>Shares</th>
-            <th>Price Bought</th>
-            <th>Current value</th>
-            <th>Total Value</th>
-        </tr>
-        {% for item in history %}
-            {% if item['sold'] == 0 %}
-                <tr>
-                    <th>{{ item['stock_symbol'] }}</th> 
-                    <th>{{ item['shares'] }}</th>
-                    <th>{{ item['price_bought']|round(2, 'common') }}</th>
-                    <th>{{ item['current_price']|round(2, 'common') }}</th>
-                    <th>{{ (item['current_price']*item['shares'])|round(2, 'common') }}</th>
-                </tr>
-            {% endif %}
-        {% endfor %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Stock</th>
+                <th scope="col">Shares</th>
+                <th scope="col">Price Bought</th>
+                <th scope="col">Current value</th>
+                <th scope="col">Total Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in history %}
+                {% if item['sold'] == 0 %}
+                    <tr>
+                        <th>{{ item['stock_symbol'] }}</th> 
+                        <th>{{ item['shares'] }}</th>
+                        <th>{{ item['price_bought']| usd }}</th>
+                        <th>{{ item['current_price'] | usd }}</th>
+                        <th>{{ (item['current_price']*item['shares']) | usd }}</th>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
     </table>
-    <p>the current total value of your stock is {{ total|round(2, 'common') }} and you have {{ cash|round(2, 'common') }} remaining in your account </p>
-    <p>Your total assets is {{ (total + cash)|round(2, 'common') }}</p>
+    <p>the current total value of your stocks is {{ total | usd }} and you have {{ cash | usd }} cash remaining in your account </p>
+    <p>Your total assets is {{ (total + cash) | usd }}</p>
 {% endblock %}

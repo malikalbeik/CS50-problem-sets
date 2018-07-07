@@ -6,6 +6,6 @@
 
 {% block main %}
     <h1>Congratulations</h1>
-    <p>You have successfully sold {{ item['shares'] }} stocks of {{ item['stock_symbol'] }} at a price of {{ priceSold|round(2, 'common') }}</p>
-    <p>You now have {{ cash|round(2, 'common') }} in your wallet</p>
+    <p>{{ item['price_bought'] | usd }}You have successfully sold {{ sharesNum }} stocks of {{ item['stock_symbol'] }} at a price of {{ priceSold | usd }} the total being {{ (sharesNum * priceSold) | usd }}</p>
+    <p>You now have {{ cash | usd }} in your wallet</p>
 {% endblock %}

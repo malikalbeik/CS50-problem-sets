@@ -63,42 +63,45 @@ $(document).ready(function() {
 // Add marker for place to map
 function addMarker(place)
 {
-    var articles = getArticles(place.postal_code).then(console.log(articles));
-   
-    var infowindow = new google.maps.InfoWindow({
-        content: makeUL(articles)
-      });
+    
+    let parameters = { geo: place.postal_code };
+    
+
     var marker = new google.maps.Marker({
         position: {lat: place.latitude, lng: place.longitude},
         map: map,
         title: place.place_name,
-        animation: google.maps.Animation.DROP,
-      });
-      marker.addListener('click', function() {
-        infowindow.open(map, marker);
-      });
-}
+        label: place.place_name,
+        animation: google.maps.Animation.DROP
+    });
 
-function makeUL(array) {
-    if(array.length > 0) {
-        // Create the list element:
-        var list = document.createElement('ul');
+        // geting articles
+        $.getJSON("/articles", parameters, function(data, textStatus, jqXHR) {
+            // Call typeahead's callback with search results (i.e., places)
 
-        for(var i = 0; i < array.length; i++) {
-            // Create the list item:
-            var item = document.createElement('li');
+            if(data.length > 0) {
 
-            // Set its contents:
-            item.appendChild(document.createTextNode(array[i]));
+                // Create the list element:
 
-            // Add it to the list:
-            list.appendChild(item);
-        }
+                var list = "<ul>";
+                for (var i = 0; i < data.length; i++)
+                {
+                    //Each list item is stored into articlesString
+                    list += "<li><a href=" + data[i].link
+                    + ">" + data[i].title + "</a></li>";
+                }
 
-        // Finally, return the constructed list:
-        return list;
-    }
-   
+                // close the unordered list of articles
+		        list += "</ul>";
+            
+                // Finally, return the constructed list:
+                google.maps.event.addListener(marker, 'click', function() {
+                    showInfo(marker, list);
+                });
+            }
+        });
+        // add marker to the map markers
+        markers.push(marker);
 }
 
 // Configure application
@@ -170,7 +173,11 @@ function configure()
 // Remove markers from map
 function removeMarkers()
 {
-    // TODO
+    // remove all markers from the map
+    for (var i = 0, n = markers.length; i < n; i++)
+    {
+	    markers[i].setMap(null);
+    }
 }
 
 
@@ -185,20 +192,6 @@ function search(query, syncResults, asyncResults)
      
         // Call typeahead's callback with search results (i.e., places)
         asyncResults(data);
-    });
-}
-
-// Search database for typeahead's suggestions
-function getArticles(g)
-{
-    // Get places matching query (asynchronously)
-    let parameters = {
-        geo: g
-    };
-    $.getJSON("/articles", parameters, function(data, textStatus, jqXHR) {
-     
-        // Call typeahead's callback with search results (i.e., places)
-        return (data);
     });
 }
 

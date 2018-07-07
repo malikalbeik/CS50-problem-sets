@@ -63,9 +63,43 @@ $(document).ready(function() {
 // Add marker for place to map
 function addMarker(place)
 {
-    // TODO
+    var articles = getArticles(place.postal_code).then(console.log(articles));
+   
+    var infowindow = new google.maps.InfoWindow({
+        content: makeUL(articles)
+      });
+    var marker = new google.maps.Marker({
+        position: {lat: place.latitude, lng: place.longitude},
+        map: map,
+        title: place.place_name,
+        animation: google.maps.Animation.DROP,
+      });
+      marker.addListener('click', function() {
+        infowindow.open(map, marker);
+      });
 }
 
+function makeUL(array) {
+    if(array.length > 0) {
+        // Create the list element:
+        var list = document.createElement('ul');
+
+        for(var i = 0; i < array.length; i++) {
+            // Create the list item:
+            var item = document.createElement('li');
+
+            // Set its contents:
+            item.appendChild(document.createTextNode(array[i]));
+
+            // Add it to the list:
+            list.appendChild(item);
+        }
+
+        // Finally, return the constructed list:
+        return list;
+    }
+   
+}
 
 // Configure application
 function configure()

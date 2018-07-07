@@ -154,6 +154,20 @@ function search(query, syncResults, asyncResults)
     });
 }
 
+// Search database for typeahead's suggestions
+function getArticles(g)
+{
+    // Get places matching query (asynchronously)
+    let parameters = {
+        geo: g
+    };
+    $.getJSON("/articles", parameters, function(data, textStatus, jqXHR) {
+     
+        // Call typeahead's callback with search results (i.e., places)
+        return (data);
+    });
+}
+
 
 // Show info window at marker with content
 function showInfo(marker, content)

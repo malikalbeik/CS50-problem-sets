@@ -38,7 +38,7 @@ $(document).ready(function() {
     // Options for map
     // https://developers.google.com/maps/documentation/javascript/reference#MapOptions
     let options = {
-        center: {lat: 37.4236, lng: -122.1619}, // Stanford, California
+        center: {lat: 41.3184, lng: 72.9318}, // New Haven
         disableDefaultUI: true,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         maxZoom: 14,
@@ -97,9 +97,7 @@ function configure()
         source: search,
         templates: {
             suggestion: Handlebars.compile(
-                "<div>" +
-                "TODO" +
-                "</div>"
+                "<div>{{place_name}}, {{admin_name1}}, {{postal_code}}</div>"
             )
         }
     });

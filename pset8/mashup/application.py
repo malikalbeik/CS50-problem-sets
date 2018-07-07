@@ -38,9 +38,15 @@ def articles():
 @app.route("/search")
 def search():
     """Search for places that match query"""
+    q = "%" + request.args.get("q") + "%"
+    print(q)
 
-    # TODO
-    return jsonify([])
+    if not q:
+        raise RuntimeError("query not provided")
+
+    places = db.execute("SELECT * FROM places WHERE postal_code LIKE :q OR place_name LIKE :q OR admin_name1 LIKE :q", q=q)
+
+    return jsonify(places)
 
 
 @app.route("/update")

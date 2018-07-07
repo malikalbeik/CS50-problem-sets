@@ -31,8 +31,15 @@ def index():
 def articles():
     """Look up articles for geo"""
 
-    # TODO
-    return jsonify([])
+    # retrieve geo argument from the url.
+    geo = request.args.get("geo")
+
+    if not geo:
+        raise RuntimeError("geo not provided")
+
+    articles = lookup(geo)
+
+    return jsonify(articles)
 
 
 @app.route("/search")
